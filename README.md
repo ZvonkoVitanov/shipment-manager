@@ -1,58 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Shipment Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web application for managing shipments, clients, shipment labels, grouped shipments, Excel imports, and shipment tracking.
 
-## About Laravel
+The system is built with **Laravel**, **Inertia.js**, **React**, and **Tailwind CSS**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## About the Project
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Shipment Manager is designed to help clients create and manage shipments through a simple web interface.
 
-## Learning Laravel
+Clients can manually enter shipment data, import multiple shipments through Excel files, generate shipment labels, print labels, and track shipment statuses. The system also supports **grouped shipments**, where multiple shipments can be delivered to the same recipient and processed with a discount.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Main Features
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Authentication
 
-## Agentic Development
+- User registration
+- User login
+- Protected dashboard routes
+- Client-specific shipment access
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+### Shipment Management
 
-php artisan boost:install
-```
+Clients can create shipments by filling out a web form with details such as:
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+- Recipient name
+- Recipient phone number
+- Address
+- City
+- Package information
+- Delivery notes
+- Shipment status
 
-## Contributing
+Each shipment can be viewed, edited, and managed from the client dashboard.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### Excel Shipment Import
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Clients can upload an Excel file with a predefined structure.
 
-## Security Vulnerabilities
+The system supports:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Bulk shipment import
+- Preview before saving
+- Validation of required fields
+- Error handling for incorrectly filled files
 
-## License
+This makes it easier for clients who need to create many shipments at once.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+### Shipment Labels
+
+Each shipment has a printable label page.
+
+The label includes the important shipment information needed for delivery, such as:
+
+- Sender information
+- Recipient information
+- Address
+- Phone number
+- Barcode / shipment identifier
+- Shipment details
+
+The print button prints only the label container, not the entire page.
+
+---
+
+### Grouped Shipments
+
+The system supports **grouped shipments**.
+
+Grouped shipments are used when:
+
+- One sender sends from one location
+- The recipient is the same person
+- The recipient is identified by phone number
+- Multiple shipments are delivered at the same time
+
+Grouped shipments can include:
+
+- Number of shipments
+- Discount percentage
+- Grouped shipment label
+- Total price calculation with discount
+
+This allows clients to process multiple shipments for the same recipient more efficiently.
+
+---
+
+### Shipment Tracking
+
+Each shipment has a status that can be updated and tracked.
+
+Example statuses:
+
+- Pending
+- Accepted
+- In Transit
+- Delivered
+- Cancelled
+
+Clients can follow the progress of their shipments from their dashboard.
+
+---
+
+## Tech Stack
+
+- **Laravel** - Backend framework
+- **Inertia.js** - Connects Laravel backend with React frontend
+- **React** - Frontend UI
+- **Tailwind CSS** - Styling
+- **MySQL / MariaDB** - Database
+- **Laravel Excel** - Excel import support
+- **Vite** - Frontend build tool
+
+---
