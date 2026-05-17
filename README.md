@@ -117,7 +117,7 @@ Clients can follow the progress of their shipments from their dashboard.
 - **Inertia.js** - Connects Laravel backend with React frontend
 - **React** - Frontend UI
 - **Tailwind CSS** - Styling
-- **MySQL / MariaDB** - Database
+- **MySQL** - Database
 - **Laravel Excel** - Excel import support
 - **Vite** - Frontend build tool
 
