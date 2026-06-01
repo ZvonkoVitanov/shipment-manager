@@ -88,7 +88,7 @@ export default function Label({ shipment }) {
 
                                     <div className="mt-1 flex h-20 items-center justify-center border border-gray-900 bg-white p-1">
                                         <QRCodeSVG
-                                            value={route('tracking.show', shipment.id)}
+                                            value={route('tracking.show', shipment.barcode)}
                                             size={70}
                                             level="M"
                                         />

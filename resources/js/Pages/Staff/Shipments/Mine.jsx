@@ -114,8 +114,8 @@ export default function Mine({ shipments, filters, statuses }) {
                                 </thead>
 
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {shipments.length > 0 ? (
-                                    shipments.map((shipment) => (
+                                {shipments.data.length > 0 ? (
+                                    shipments.data.map((shipment) => (
                                         <tr key={shipment.id}>
                                             <TableCell strong>{shipment.barcode}</TableCell>
                                             <TableCell>{shipment.client?.company_name}</TableCell>
