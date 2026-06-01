@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password','role'])]
+#[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,9 +32,8 @@ class User extends Authenticatable
 
     public const ROLE_CLIENT = 'client';
     public const ROLE_SUPER_ADMIN = 'super_admin';
-    public const ROLE_CLIENT_ADMIN = 'client_admin';
-    public const ROLE_FINANCE_ADMIN = 'finance_admin';
-    public const ROLE_MARKETING_ADMIN = 'marketing_admin';
+    public const ROLE_OPERATOR = 'operator';
+
 
     public function isClient(): bool
     {
@@ -45,29 +44,25 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_SUPER_ADMIN;
     }
-
-    public function isClientAdmin(): bool
+    public function isOperator(): bool
     {
-        return $this->role === self::ROLE_CLIENT_ADMIN;
+        return $this->role === self::ROLE_OPERATOR;
     }
 
-    public function isFinanceAdmin(): bool
-    {
-        return $this->role === self::ROLE_FINANCE_ADMIN;
-    }
 
-    public function isMarketingAdmin(): bool
-    {
-        return $this->role === self::ROLE_MARKETING_ADMIN;
-    }
 
     public function isAdmin(): bool
     {
         return in_array($this->role, [
             self::ROLE_SUPER_ADMIN,
-            self::ROLE_CLIENT_ADMIN,
-            self::ROLE_FINANCE_ADMIN,
-            self::ROLE_MARKETING_ADMIN,
+        ]);
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, [
+            self::ROLE_SUPER_ADMIN,
+            self::ROLE_OPERATOR,
         ]);
     }
 
@@ -79,6 +74,11 @@ class User extends Authenticatable
     public function changedShipmentStatuses()
     {
         return $this->hasMany(ShipmentStatusHistory::class, 'changed_by_user_id');
+    }
+
+    public function assignedShipments()
+    {
+        return $this->hasMany(Shipment::class, 'operator_id');
     }
 
 }

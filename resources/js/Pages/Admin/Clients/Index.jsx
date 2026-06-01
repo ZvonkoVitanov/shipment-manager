@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import Pagination from "@/Components/Pagination.jsx";
 
 export default function Index({ clients }) {
     const { flash } = usePage().props;
@@ -54,8 +55,8 @@ export default function Index({ clients }) {
                             </thead>
 
                             <tbody className="divide-y divide-gray-200 bg-white">
-                            {clients.length > 0 ? (
-                                clients.map((client) => (
+                            {clients.data.length > 0 ? (
+                                clients.data.map((client) => (
                                     <tr key={client.id}>
                                         <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                                             {client.company_name}
@@ -84,6 +85,7 @@ export default function Index({ clients }) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination links={clients.links} />
                 </div>
             </div>
         </AuthenticatedLayout>

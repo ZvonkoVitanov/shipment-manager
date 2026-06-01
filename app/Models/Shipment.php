@@ -42,12 +42,18 @@ class Shipment extends Model
         'is_locked',
         'shipment_import_id',
         'grouped_shipment_id',
+        'operator_id',
+        'assigned_at',
+        'delivery_code',
+        'delivered_verified_at',
     ];
 
     protected $casts = [
         'ransom_amount' => 'decimal:2',
         'weight' => 'decimal:2',
         'is_locked' => 'boolean',
+        'assigned_at' => 'datetime',
+        'delivered_verified_at' => 'datetime',
     ];
 
     public function client()
@@ -69,4 +75,10 @@ class Shipment extends Model
     {
         return $this->belongsTo(GroupedShipment::class);
     }
+
+    public function operator()
+    {
+        return $this->belongsTo(User::class, 'operator_id');
+    }
+
 }

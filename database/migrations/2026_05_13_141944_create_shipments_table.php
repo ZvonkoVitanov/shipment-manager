@@ -64,6 +64,13 @@ return new class extends Migration
 
             $table->boolean('is_locked')->default(false);
 
+            $table->foreignId('operator_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->timestamp('assigned_at')->nullable();
+
             $table->timestamps();
         });
     }

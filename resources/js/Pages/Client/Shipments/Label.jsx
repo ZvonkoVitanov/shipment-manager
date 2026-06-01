@@ -148,6 +148,20 @@ export default function Label({ shipment }) {
                                 <Info label="Status" value={formatText(shipment.latest_status)} />
                             </div>
 
+                            <div className="mt-5 border-t border-gray-300 pt-4 text-center">
+                                <p className="text-xs font-bold uppercase text-gray-500">
+                                    Delivery Confirmation Code
+                                </p>
+
+                                <p className="mt-1 font-mono text-2xl font-black tracking-widest text-gray-900">
+                                    {shipment.delivery_code}
+                                </p>
+
+                                <p className="mt-1 text-[10px] text-gray-500">
+                                    Recipient gives this code to the operator upon delivery.
+                                </p>
+                            </div>
+
                             {shipment.note && (
                                 <div className="mt-5 border-t border-gray-300 pt-4">
                                     <p className="text-xs font-bold uppercase text-gray-500">

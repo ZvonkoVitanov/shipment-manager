@@ -1,8 +1,27 @@
+import Pagination from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function Index({ shipments }) {
+export default function Index({ shipments, filters, statuses }) {
     const { flash } = usePage().props;
+
+    const [data, setData] = useState({
+        search: filters.search || '',
+        status: filters.status || '',
+        city: filters.city || '',
+        date_from: filters.date_from || '',
+        date_to: filters.date_to || '',
+    });
+
+    function applyFilters(e) {
+        e.preventDefault();
+
+        router.get(route('client.shipments.index'), data, {
+            preserveState: true,
+            replace: true,
+        });
+    }
 
     return (
         <AuthenticatedLayout>
@@ -42,6 +61,76 @@ export default function Index({ shipments }) {
                         </div>
                     )}
 
+                    <form
+                        onSubmit={applyFilters}
+                        className="mb-6 rounded-lg bg-white p-6 shadow-sm"
+                    >
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+                            <Input
+                                label="Search"
+                                value={data.search}
+                                onChange={(e) => setData({ ...data, search: e.target.value })}
+                                placeholder="Barcode, recipient, phone..."
+                            />
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Status
+                                </label>
+
+                                <select
+                                    value={data.status}
+                                    onChange={(e) => setData({ ...data, status: e.target.value })}
+                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
+                                >
+                                    <option value="">All statuses</option>
+
+                                    {statuses.map((status) => (
+                                        <option key={status} value={status}>
+                                            {formatStatus(status)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <Input
+                                label="City"
+                                value={data.city}
+                                onChange={(e) => setData({ ...data, city: e.target.value })}
+                                placeholder="Skopje..."
+                            />
+
+                            <Input
+                                label="Date From"
+                                type="date"
+                                value={data.date_from}
+                                onChange={(e) => setData({ ...data, date_from: e.target.value })}
+                            />
+
+                            <Input
+                                label="Date To"
+                                type="date"
+                                value={data.date_to}
+                                onChange={(e) => setData({ ...data, date_to: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="mt-4 flex justify-end gap-3">
+                            <Link
+                                href={route('client.shipments.index')}
+                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                            >
+                                Clear
+                            </Link>
+
+                            <button
+                                type="submit"
+                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                            >
+                                Apply Filters
+                            </button>
+                        </div>
+                    </form>
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
@@ -59,8 +148,8 @@ export default function Index({ shipments }) {
                             </thead>
 
                             <tbody className="divide-y divide-gray-200 bg-white">
-                            {shipments.length > 0 ? (
-                                shipments.map((shipment) => (
+                            {shipments.data.length > 0 ? (
+                                shipments.data.map((shipment) => (
                                     <tr key={shipment.id}>
                                         <TableCell strong>
                                             {shipment.barcode}
@@ -111,6 +200,7 @@ export default function Index({ shipments }) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination links={shipments.links} />
                 </div>
             </div>
         </AuthenticatedLayout>
@@ -141,4 +231,22 @@ function formatStatus(status) {
     return status
         .replaceAll('_', ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function Input({ label, type = 'text', value, onChange, placeholder = '' }) {
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700">
+                {label}
+            </label>
+
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
+            />
+        </div>
+    );
 }

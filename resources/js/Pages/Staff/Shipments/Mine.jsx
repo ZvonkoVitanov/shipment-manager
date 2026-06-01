@@ -1,61 +1,65 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import {Head, Link, router} from '@inertiajs/react';
-import {useState} from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 import Pagination from "@/Components/Pagination.jsx";
 
-export default function Shipments({shipments, filters, statuses, totals}) {
+export default function Mine({ shipments, filters, statuses }) {
     const [data, setData] = useState({
-        status: filters.status || '',
-        date_from: filters.date_from || '',
-        date_to: filters.date_to || '',
+        search: filters.search || '',
         city: filters.city || '',
+        status: filters.status || '',
     });
 
     function applyFilters(e) {
         e.preventDefault();
 
-        router.get(route('client.reports.shipments'), data, {
+        router.get(route('staff.shipments.mine'), data, {
             preserveState: true,
             replace: true,
         });
     }
-
-    function exportCsv() {
-        const params = new URLSearchParams();
-
-        Object.entries(data).forEach(([key, value]) => {
-            if (value) {
-                params.append(key, value);
-            }
-        });
-
-        window.location.href =
-            route('client.reports.shipments.export-csv') + '?' + params.toString();
-    }
-
-    const totalShipments = totals.total_shipments;
-    const totalRansom = Number(totals.total_ransom || 0);
     return (
         <AuthenticatedLayout>
-            <Head title="Shipment Reports"/>
+            <Head title="My Shipments" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            Shipment Reports
-                        </h1>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                My Shipments
+                            </h1>
+                            <p className="mt-1 text-sm text-gray-600">
+                                Shipments assigned to you.
+                            </p>
+                        </div>
 
-                        <p className="mt-1 text-sm text-gray-600">
-                            Filter shipments and export report data.
-                        </p>
+                        <Link
+                            href={route('staff.shipments.available')}
+                            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                        >
+                            Available Shipments
+                        </Link>
                     </div>
-
                     <form
                         onSubmit={applyFilters}
                         className="rounded-lg bg-white p-6 shadow-sm"
                     >
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <Input
+                                label="Search"
+                                value={data.search}
+                                onChange={(e) => setData({ ...data, search: e.target.value })}
+                                placeholder="Barcode, recipient, phone..."
+                            />
+
+                            <Input
+                                label="City"
+                                value={data.city}
+                                onChange={(e) => setData({ ...data, city: e.target.value })}
+                                placeholder="Skopje..."
+                            />
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
                                     Status
@@ -63,9 +67,7 @@ export default function Shipments({shipments, filters, statuses, totals}) {
 
                                 <select
                                     value={data.status}
-                                    onChange={(e) =>
-                                        setData({...data, status: e.target.value})
-                                    }
+                                    onChange={(e) => setData({ ...data, status: e.target.value })}
                                     className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
                                 >
                                     <option value="">All statuses</option>
@@ -77,37 +79,11 @@ export default function Shipments({shipments, filters, statuses, totals}) {
                                     ))}
                                 </select>
                             </div>
-
-                            <Input
-                                label="Date From"
-                                type="date"
-                                value={data.date_from}
-                                onChange={(e) =>
-                                    setData({...data, date_from: e.target.value})
-                                }
-                            />
-
-                            <Input
-                                label="Date To"
-                                type="date"
-                                value={data.date_to}
-                                onChange={(e) =>
-                                    setData({...data, date_to: e.target.value})
-                                }
-                            />
-
-                            <Input
-                                label="City"
-                                value={data.city}
-                                onChange={(e) =>
-                                    setData({...data, city: e.target.value})
-                                }
-                            />
                         </div>
 
-                        <div className="mt-6 flex flex-wrap justify-end gap-3">
+                        <div className="mt-4 flex justify-end gap-3">
                             <Link
-                                href={route('client.reports.shipments')}
+                                href={route('staff.shipments.mine')}
                                 className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                             >
                                 Clear
@@ -119,105 +95,71 @@ export default function Shipments({shipments, filters, statuses, totals}) {
                             >
                                 Apply Filters
                             </button>
-
-                            <button
-                                type="button"
-                                onClick={exportCsv}
-                                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-                            >
-                                Export CSV
-                            </button>
                         </div>
                     </form>
-
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <Stat label="Total Shipments" value={totalShipments}/>
-                        <Stat label="Total Ransom Amount" value={`${totalRansom.toFixed(2)} MKD`} />
-                    </div>
-
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                 <tr>
                                     <TableHead>Barcode</TableHead>
+                                    <TableHead>Client</TableHead>
                                     <TableHead>Recipient</TableHead>
                                     <TableHead>City</TableHead>
                                     <TableHead>Phone</TableHead>
-                                    <TableHead>Ransom</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Created</TableHead>
+                                    <TableHead>Assigned</TableHead>
+                                    <TableHead>Action</TableHead>
                                 </tr>
                                 </thead>
 
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {shipments.data.length > 0 ? (
-                                    shipments.data.map((shipment) => (
+                                {shipments.length > 0 ? (
+                                    shipments.map((shipment) => (
                                         <tr key={shipment.id}>
                                             <TableCell strong>{shipment.barcode}</TableCell>
+                                            <TableCell>{shipment.client?.company_name}</TableCell>
                                             <TableCell>{shipment.recipient_name}</TableCell>
                                             <TableCell>{shipment.recipient_city}</TableCell>
                                             <TableCell>{shipment.recipient_phone}</TableCell>
-                                            <TableCell>{shipment.ransom_amount} MKD</TableCell>
                                             <TableCell>{formatText(shipment.latest_status)}</TableCell>
                                             <TableCell>
-                                                {new Date(shipment.created_at).toLocaleDateString()}
+                                                {shipment.assigned_at
+                                                    ? new Date(shipment.assigned_at).toLocaleString()
+                                                    : '-'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Link
+                                                    href={route('staff.shipments.show', shipment.id)}
+                                                    className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                                                >
+                                                    Update Status
+                                                </Link>
                                             </TableCell>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan="7"
+                                            colSpan="8"
                                             className="px-6 py-8 text-center text-sm text-gray-500"
                                         >
-                                            No shipments found for selected filters.
+                                            No assigned shipments.
                                         </td>
                                     </tr>
                                 )}
                                 </tbody>
                             </table>
                         </div>
+                        <Pagination links={shipments.links} />
                     </div>
-                    <Pagination links={shipments.links}/>
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 }
 
-function Input({label, type = 'text', value, onChange}) {
-    return (
-        <div>
-            <label className="block text-sm font-medium text-gray-700">
-                {label}
-            </label>
-
-            <input
-                type={type}
-                value={value}
-                onChange={onChange}
-                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
-            />
-        </div>
-    );
-}
-
-function Stat({label, value}) {
-    return (
-        <div className="rounded-lg bg-white p-4 shadow-sm">
-            <p className="text-xs font-bold uppercase text-gray-500">
-                {label}
-            </p>
-
-            <p className="mt-1 text-xl font-bold text-gray-900">
-                {value}
-            </p>
-        </div>
-    );
-}
-
-function TableHead({children}) {
+function TableHead({ children }) {
     return (
         <th className="whitespace-nowrap px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
             {children}
@@ -225,7 +167,7 @@ function TableHead({children}) {
     );
 }
 
-function TableCell({children, strong = false}) {
+function TableCell({ children, strong = false }) {
     return (
         <td
             className={`whitespace-nowrap px-6 py-4 text-sm ${
@@ -243,4 +185,22 @@ function formatText(value) {
     return value
         .replaceAll('_', ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function Input({ label, value, onChange, placeholder = '' }) {
+    return (
+        <div>
+            <label className="block text-sm font-medium text-gray-700">
+                {label}
+            </label>
+
+            <input
+                type="text"
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
+            />
+        </div>
+    );
 }

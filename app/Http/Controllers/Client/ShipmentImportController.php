@@ -20,7 +20,8 @@ class ShipmentImportController extends Controller
 
         $imports = $client->shipmentImports()
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Client/ShipmentImports/Index', [
             'imports' => $imports,
@@ -174,6 +175,7 @@ class ShipmentImportController extends Controller
                     'client_id' => $client->id,
                     'shipment_import_id' => $import->id,
                     'barcode' => $this->generateBarcode(),
+                    'delivery_code' => $this->generateDeliveryCode(),
 
                     'recipient_name' => $data['recipient_name'],
                     'recipient_address' => $data['recipient_address'],
@@ -227,5 +229,10 @@ class ShipmentImportController extends Controller
         $nextId = Shipment::max('id') + 1;
 
         return 'MKP-' . now()->year . '-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+    }
+
+    private function generateDeliveryCode(): string
+    {
+        return (string) random_int(100000, 999999);
     }
 }

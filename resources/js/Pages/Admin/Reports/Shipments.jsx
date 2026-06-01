@@ -1,8 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import {Head, Link, router} from '@inertiajs/react';
+import {useState} from 'react';
+import Pagination from "@/Components/Pagination.jsx";
 
-export default function Shipments({ shipments, clients, filters, statuses }) {
+export default function Shipments({shipments, clients, filters, statuses, totals}) {
     const [data, setData] = useState({
         client_id: filters.client_id || '',
         status: filters.status || '',
@@ -33,24 +34,14 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
             route('admin.reports.shipments.export-csv') + '?' + params.toString();
     }
 
-    const totalShipments = shipments.length;
-
-    const totalRansom = shipments.reduce(
-        (sum, shipment) => sum + Number(shipment.ransom_amount || 0),
-        0
-    );
-
-    const deliveredCount = shipments.filter(
-        (shipment) => shipment.latest_status === 'delivered'
-    ).length;
-
-    const returnedCount = shipments.filter(
-        (shipment) => shipment.latest_status === 'returned'
-    ).length;
+    const totalShipments = totals.total_shipments;
+    const totalRansom = Number(totals.total_ransom || 0);
+    const deliveredCount = totals.delivered_count;
+    const returnedCount = totals.returned_count;
 
     return (
         <AuthenticatedLayout>
-            <Head title="Admin Shipment Reports" />
+            <Head title="Admin Shipment Reports"/>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
@@ -77,7 +68,7 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 <select
                                     value={data.client_id}
                                     onChange={(e) =>
-                                        setData({ ...data, client_id: e.target.value })
+                                        setData({...data, client_id: e.target.value})
                                     }
                                     className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
                                 >
@@ -99,7 +90,7 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 <select
                                     value={data.status}
                                     onChange={(e) =>
-                                        setData({ ...data, status: e.target.value })
+                                        setData({...data, status: e.target.value})
                                     }
                                     className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm"
                                 >
@@ -118,7 +109,7 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 type="date"
                                 value={data.date_from}
                                 onChange={(e) =>
-                                    setData({ ...data, date_from: e.target.value })
+                                    setData({...data, date_from: e.target.value})
                                 }
                             />
 
@@ -127,7 +118,7 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 type="date"
                                 value={data.date_to}
                                 onChange={(e) =>
-                                    setData({ ...data, date_to: e.target.value })
+                                    setData({...data, date_to: e.target.value})
                                 }
                             />
 
@@ -135,7 +126,7 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 label="City"
                                 value={data.city}
                                 onChange={(e) =>
-                                    setData({ ...data, city: e.target.value })
+                                    setData({...data, city: e.target.value})
                                 }
                             />
                         </div>
@@ -166,10 +157,10 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                     </form>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                        <Stat label="Total Shipments" value={totalShipments} />
-                        <Stat label="Delivered" value={deliveredCount} />
-                        <Stat label="Returned" value={returnedCount} />
-                        <Stat label="Total Ransom" value={`${totalRansom.toFixed(2)} MKD`} />
+                        <Stat label="Total Shipments" value={totalShipments}/>
+                        <Stat label="Delivered" value={deliveredCount}/>
+                        <Stat label="Returned" value={returnedCount}/>
+                        <Stat label="Total Ransom" value={`${totalRansom.toFixed(2)} MKD`}/>
                     </div>
 
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -190,8 +181,8 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                                 </thead>
 
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {shipments.length > 0 ? (
-                                    shipments.map((shipment) => (
+                                {shipments.data.length > 0 ? (
+                                    shipments.data.map((shipment) => (
                                         <tr key={shipment.id}>
                                             <TableCell>{shipment.client?.company_name}</TableCell>
                                             <TableCell strong>{shipment.barcode}</TableCell>
@@ -227,13 +218,14 @@ export default function Shipments({ shipments, clients, filters, statuses }) {
                             </table>
                         </div>
                     </div>
+                    <Pagination links={shipments.links}/>
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 }
 
-function Input({ label, type = 'text', value, onChange }) {
+function Input({label, type = 'text', value, onChange}) {
     return (
         <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -250,7 +242,7 @@ function Input({ label, type = 'text', value, onChange }) {
     );
 }
 
-function Stat({ label, value }) {
+function Stat({label, value}) {
     return (
         <div className="rounded-lg bg-white p-4 shadow-sm">
             <p className="text-xs font-bold uppercase text-gray-500">
@@ -264,7 +256,7 @@ function Stat({ label, value }) {
     );
 }
 
-function TableHead({ children }) {
+function TableHead({children}) {
     return (
         <th className="whitespace-nowrap px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
             {children}
@@ -272,7 +264,7 @@ function TableHead({ children }) {
     );
 }
 
-function TableCell({ children, strong = false }) {
+function TableCell({children, strong = false}) {
     return (
         <td
             className={`whitespace-nowrap px-6 py-4 text-sm ${

@@ -16,7 +16,8 @@ export default function AuthenticatedLayout({ header, children }) {
     ].includes(user.role);
 
     const isClient = user.role === 'client';
-
+    const isOperator = user.role === 'operator';
+    const isSuperAdmin = user.role === 'super_admin';
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
@@ -33,12 +34,14 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
+                                {isSuperAdmin && (
+                                    <NavLink
+                                        href={route('admin.operators.index')}
+                                        active={route().current('admin.operators.*')}
+                                    >
+                                        Operators
+                                    </NavLink>
+                                )}
                                 {isAdmin && (
                                     <>
                                         <NavLink
@@ -60,6 +63,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                             active={route().current('admin.reports.*')}
                                         >
                                             Reports
+                                        </NavLink>
+                                    </>
+                                )}
+                                {isOperator && (
+                                    <>
+                                        <NavLink
+                                            href={route('staff.shipments.available')}
+                                            active={route().current('staff.shipments.available')}
+                                        >
+                                            Available Shipments
+                                        </NavLink>
+
+                                        <NavLink
+                                            href={route('staff.shipments.mine')}
+                                            active={route().current('staff.shipments.mine') || route().current('staff.shipments.show')}
+                                        >
+                                            My Shipments
                                         </NavLink>
                                     </>
                                 )}
@@ -192,12 +212,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
+                        {isSuperAdmin && (
+                            <ResponsiveNavLink
+                                href={route('admin.operators.index')}
+                                active={route().current('admin.operators.*')}
+                            >
+                                Operators
+                            </ResponsiveNavLink>
+                        )}
                         {isAdmin && (
                             <>
                                 <ResponsiveNavLink
@@ -219,6 +241,24 @@ export default function AuthenticatedLayout({ header, children }) {
                                     active={route().current('admin.reports.*')}
                                 >
                                     Reports
+                                </ResponsiveNavLink>
+                            </>
+                        )}
+
+                        {isOperator && (
+                            <>
+                                <ResponsiveNavLink
+                                    href={route('staff.shipments.available')}
+                                    active={route().current('staff.shipments.available')}
+                                >
+                                    Available Shipments
+                                </ResponsiveNavLink>
+
+                                <ResponsiveNavLink
+                                    href={route('staff.shipments.mine')}
+                                    active={route().current('staff.shipments.mine') || route().current('staff.shipments.show')}
+                                >
+                                    My Shipments
                                 </ResponsiveNavLink>
                             </>
                         )}

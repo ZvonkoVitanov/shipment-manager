@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import Pagination from "@/Components/Pagination.jsx";
 
 export default function Index({ imports }) {
     const { flash } = usePage().props;
@@ -55,8 +56,8 @@ export default function Index({ imports }) {
                             </thead>
 
                             <tbody className="divide-y divide-gray-200 bg-white">
-                            {imports.length > 0 ? (
-                                imports.map((importRecord) => (
+                            {imports.data.length > 0 ? (
+                                imports.data.map((importRecord) => (
                                     <tr key={importRecord.id}>
                                         <TableCell strong>{importRecord.file_name}</TableCell>
                                         <TableCell>{formatText(importRecord.status)}</TableCell>
@@ -89,6 +90,7 @@ export default function Index({ imports }) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination links={imports.links} />
                 </div>
             </div>
         </AuthenticatedLayout>

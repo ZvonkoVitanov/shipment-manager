@@ -18,7 +18,8 @@ class GroupedShipmentController extends Controller
         $groupedShipments = $client->groupedShipments()
             ->withCount('shipments')
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Client/GroupedShipments/Index', [
             'groupedShipments' => $groupedShipments,

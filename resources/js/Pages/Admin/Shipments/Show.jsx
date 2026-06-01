@@ -2,13 +2,13 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function Show({ shipment, statuses }) {
-    const { flash } = usePage().props;
+    const { auth, flash } = usePage().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
         status: shipment.latest_status,
         note: '',
     });
-
+    const isSuperAdmin = auth.user.role === 'super_admin';
     function submit(e) {
         e.preventDefault();
 
@@ -66,9 +66,16 @@ export default function Show({ shipment, statuses }) {
                                 <Detail label="Pickup Type" value={formatStatus(shipment.pickup_type)} />
                                 <Detail label="Pickup Location" value={shipment.pickup_location} />
                                 <Detail label="Current Status" value={formatStatus(shipment.latest_status)} />
+                                {isSuperAdmin && (
+                                    <Link
+                                        href={route('admin.shipments.edit', shipment.id)}
+                                        className="mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                    >
+                                        Edit Shipment Details
+                                    </Link>
+                                )}
                             </div>
                         </div>
-
                         <div className="bg-white p-6 shadow-sm sm:rounded-lg">
                             <h2 className="text-lg font-semibold text-gray-900">
                                 Update Status

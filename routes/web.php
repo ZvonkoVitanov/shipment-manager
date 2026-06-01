@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ClientController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
+use App\Http\Controllers\Admin\OperatorController;
 use App\Http\Controllers\Admin\ShipmentController as AdminShipmentController;
 use App\Http\Controllers\Admin\ShipmentReportController as AdminShipmentReportController;
 use App\Http\Controllers\Client\GroupedShipmentController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Client\ShipmentReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Staff\OperatorShipmentController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -22,33 +22,50 @@ Route::get('/track/{barcode}', [TrackingController::class, 'show'])->name('track
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        if (auth()->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        if (auth()->user()->isOperator()) {
+            return redirect()->route('staff.shipments.available');
         }
 
-        return redirect()->route('client.dashboard');
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.shipments.index');
+        }
+
+        return redirect()->route('client.shipments.index');
     })->name('dashboard');
 
     Route::middleware('admin')
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-            Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-                ->name('dashboard');
-
             Route::resource('clients', ClientController::class)->only([
                 'index',
                 'create',
                 'store',
             ]);
+
+            Route::resource('operators', OperatorController::class)->only([
+                    'index',
+                    'create',
+                    'store',
+            ]);
+
             Route::get('/shipments', [AdminShipmentController::class, 'index'])
                 ->name('shipments.index');
 
             Route::get('/shipments/{shipment}', [AdminShipmentController::class, 'show'])
                 ->name('shipments.show');
 
-            Route::post('/shipments/{shipment}/status', [AdminShipmentController::class, 'updateStatus'])
-                ->name('shipments.update-status');
+            Route::middleware('role:super_admin')->group(function () {
+                Route::get('/shipments/{shipment}/edit', [AdminShipmentController::class, 'edit'])
+                    ->name('shipments.edit');
+
+                Route::put('/shipments/{shipment}', [AdminShipmentController::class, 'update'])
+                    ->name('shipments.update');
+
+                Route::post('/shipments/{shipment}/status', [AdminShipmentController::class, 'updateStatus'])
+                    ->name('shipments.update-status');
+            });
+
 
             Route::get('/reports/shipments', [AdminShipmentReportController::class, 'index'])
                 ->name('reports.shipments');
@@ -61,9 +78,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('client')
         ->name('client.')
         ->group(function () {
-            Route::get('/dashboard', [ClientDashboardController::class, 'index'])
-                ->name('dashboard');
-
             Route::resource('shipments', ShipmentController::class)->only([
                 'index',
                 'create',
@@ -108,6 +122,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'store',
             ]);
 
+        });
+
+    Route::middleware('staff')
+        ->prefix('staff')
+        ->name('staff.')
+        ->group(function () {
+            Route::get('/shipments/available', [OperatorShipmentController::class, 'available'])
+                ->middleware('role:operator,super_admin')
+                ->name('shipments.available');
+
+            Route::get('/shipments/my', [OperatorShipmentController::class, 'mine'])
+                ->middleware('role:operator,super_admin')
+                ->name('shipments.mine');
+
+            Route::get('/shipments/{shipment}', [OperatorShipmentController::class, 'show'])
+                ->middleware('role:operator,super_admin')
+                ->name('shipments.show');
+
+            Route::post('/shipments/{shipment}/take', [OperatorShipmentController::class, 'take'])
+                ->middleware('role:operator,super_admin')
+                ->name('shipments.take');
+
+            Route::post('/shipments/{shipment}/status', [OperatorShipmentController::class, 'updateStatus'])
+                ->middleware('role:operator,super_admin')
+                ->name('shipments.update-status');
         });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

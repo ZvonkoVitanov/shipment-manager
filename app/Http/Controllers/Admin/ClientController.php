@@ -15,7 +15,8 @@ class ClientController extends Controller
     {
         $clients = Client::with('user')
             ->latest()
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Admin/Clients/Index', [
             'clients' => $clients,

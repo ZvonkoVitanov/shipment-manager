@@ -9,16 +9,61 @@ use Inertia\Inertia;
 
 class ShipmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $client = auth()->user()->client;
 
-        $shipments = $client->shipments()
-            ->latest()
-            ->get();
+        $query = $client->shipments()
+            ->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('barcode', 'like', "%{$search}%")
+                    ->orWhere('recipient_name', 'like', "%{$search}%")
+                    ->orWhere('recipient_phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('latest_status', $request->status);
+        }
+
+        if ($request->filled('city')) {
+            $query->where('recipient_city', 'like', '%' . $request->city . '%');
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $shipments = $query
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Client/Shipments/Index', [
             'shipments' => $shipments,
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
+                'city' => $request->city,
+                'date_from' => $request->date_from,
+                'date_to' => $request->date_to,
+            ],
+            'statuses' => [
+                Shipment::STATUS_CREATED,
+                Shipment::STATUS_PICKED_UP,
+                Shipment::STATUS_IN_TRANSIT,
+                Shipment::STATUS_OUT_FOR_DELIVERY,
+                Shipment::STATUS_DELIVERED,
+                Shipment::STATUS_RETURNED,
+                Shipment::STATUS_CANCELLED,
+            ],
         ]);
     }
 
@@ -52,6 +97,7 @@ class ShipmentController extends Controller
         $shipment = Shipment::create([
             'client_id' => $client->id,
             'barcode' => $this->generateBarcode(),
+            'delivery_code' => $this->generateDeliveryCode(),
 
             'recipient_name' => $validated['recipient_name'],
             'recipient_address' => $validated['recipient_address'],
@@ -120,5 +166,9 @@ class ShipmentController extends Controller
         $nextId = Shipment::max('id') + 1;
 
         return 'MKP-' . now()->year . '-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+    }
+    private function generateDeliveryCode(): string
+    {
+        return (string) random_int(100000, 999999);
     }
 }

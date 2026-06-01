@@ -33,7 +33,16 @@ class ShipmentReportController extends Controller
             $query->where('recipient_city', 'like', '%' . $request->city . '%');
         }
 
-        $shipments = $query->get();
+        $totalsQuery = clone $query;
+
+        $totals = [
+            'total_shipments' => (clone $totalsQuery)->count(),
+            'total_ransom' => (clone $totalsQuery)->sum('ransom_amount'),
+        ];
+
+        $shipments = $query
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Client/Reports/Shipments', [
             'shipments' => $shipments,
@@ -52,6 +61,7 @@ class ShipmentReportController extends Controller
                 Shipment::STATUS_RETURNED,
                 Shipment::STATUS_CANCELLED,
             ],
+            'totals' => $totals,
         ]);
     }
 
