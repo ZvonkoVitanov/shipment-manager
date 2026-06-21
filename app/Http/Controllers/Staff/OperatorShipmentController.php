@@ -123,14 +123,16 @@ class OperatorShipmentController extends Controller
 
         return Inertia::render('Staff/Shipments/Show', [
             'shipment' => $shipment,
-            'statuses' => [
-                Shipment::STATUS_PICKED_UP,
-                Shipment::STATUS_IN_TRANSIT,
-                Shipment::STATUS_OUT_FOR_DELIVERY,
-                Shipment::STATUS_DELIVERED,
-                Shipment::STATUS_RETURNED,
-                Shipment::STATUS_CANCELLED,
-            ],
+            'statuses' => auth()->user()->isSuperAdmin()
+                ? [
+                    Shipment::STATUS_PICKED_UP,
+                    Shipment::STATUS_IN_TRANSIT,
+                    Shipment::STATUS_OUT_FOR_DELIVERY,
+                    Shipment::STATUS_DELIVERED,
+                    Shipment::STATUS_RETURNED,
+                    Shipment::STATUS_CANCELLED,
+                ]
+                : Shipment::allowedNextStatuses($shipment->latest_status),
         ]);
     }
 
@@ -192,15 +194,14 @@ class OperatorShipmentController extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
-        if (
-            ! $user->isSuperAdmin() &&
-            in_array($shipment->latest_status, [
-                Shipment::STATUS_DELIVERED,
-                Shipment::STATUS_RETURNED,
-                Shipment::STATUS_CANCELLED,
-            ])
-        ) {
-            return back()->with('error', 'This shipment is already finalized and cannot be changed by an operator.');
+        if (! $user->isSuperAdmin()) {
+            $allowedNextStatuses = Shipment::allowedNextStatuses($shipment->latest_status);
+
+            if (! in_array($validated['status'], $allowedNextStatuses)) {
+                return back()->withErrors([
+                    'status' => 'This status change is not allowed.',
+                ]);
+            }
         }
 
         if ($validated['status'] === Shipment::STATUS_DELIVERED) {

@@ -1,26 +1,32 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 export default function Show({ shipment, statuses }) {
     const { flash } = usePage().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        status: shipment.latest_status,
-        delivery_code:'',
+        status: statuses.length > 0 ? statuses[0] : '',
+        delivery_code: '',
         note: '',
     });
-
+    useEffect(() => {
+        setData('status', statuses.length > 0 ? statuses[0] : '');
+    }, [statuses]);
     function submit(e) {
         e.preventDefault();
 
         post(route('staff.shipments.update-status', shipment.id), {
-            onSuccess: () => reset('note', 'delivery_code'),
+            preserveScroll: true,
+            onSuccess: () => {
+                reset('note', 'delivery_code');
+            },
         });
     }
     const isFinalStatus = ['delivered', 'returned', 'cancelled'].includes(
         shipment.latest_status
     );
-
+    console.log(data)
     return (
         <AuthenticatedLayout>
             <Head title={`Shipment ${shipment.barcode}`} />
@@ -60,6 +66,7 @@ export default function Show({ shipment, statuses }) {
                                 <Detail label="Client" value={shipment.client?.company_name} />
                                 <Detail label="Recipient" value={shipment.recipient_name} />
                                 <Detail label="Phone" value={shipment.recipient_phone} />
+                                <Detail label="Recipient Email" value={shipment.recipient_email} />
                                 <Detail label="Address" value={shipment.recipient_address} />
                                 <Detail label="City" value={shipment.recipient_city} />
                                 <Detail label="Current Status" value={formatText(shipment.latest_status)} />
@@ -87,6 +94,10 @@ export default function Show({ shipment, statuses }) {
                                 </div>
                             ) : (
                                 <form onSubmit={submit} className="mt-4 space-y-4">
+                                    <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-700">
+                                        <span className="font-semibold">Current Status:</span>{' '}
+                                        {formatText(shipment.latest_status)}
+                                    </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
                                             Status

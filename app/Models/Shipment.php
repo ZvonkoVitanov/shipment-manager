@@ -46,6 +46,7 @@ class Shipment extends Model
         'assigned_at',
         'delivery_code',
         'delivered_verified_at',
+        'recipient_email',
     ];
 
     protected $casts = [
@@ -79,6 +80,40 @@ class Shipment extends Model
     public function operator()
     {
         return $this->belongsTo(User::class, 'operator_id');
+    }
+
+    public static function allowedNextStatuses(string $currentStatus): array
+    {
+        return match ($currentStatus) {
+            self::STATUS_CREATED => [
+                self::STATUS_PICKED_UP,
+                self::STATUS_CANCELLED,
+            ],
+
+            self::STATUS_PICKED_UP => [
+                self::STATUS_IN_TRANSIT,
+                self::STATUS_RETURNED,
+                self::STATUS_CANCELLED,
+            ],
+
+            self::STATUS_IN_TRANSIT => [
+                self::STATUS_OUT_FOR_DELIVERY,
+                self::STATUS_RETURNED,
+                self::STATUS_CANCELLED,
+            ],
+
+            self::STATUS_OUT_FOR_DELIVERY => [
+                self::STATUS_DELIVERED,
+                self::STATUS_RETURNED,
+                self::STATUS_CANCELLED,
+            ],
+
+            self::STATUS_DELIVERED,
+            self::STATUS_RETURNED,
+            self::STATUS_CANCELLED => [],
+
+            default => [],
+        };
     }
 
 }

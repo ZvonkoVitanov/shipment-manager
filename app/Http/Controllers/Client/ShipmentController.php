@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Mail\ShipmentDeliveryCodeMail;
+use Illuminate\Support\Facades\Mail;
 
 class ShipmentController extends Controller
 {
@@ -82,6 +84,7 @@ class ShipmentController extends Controller
             'recipient_city' => ['required', 'string', 'max:255'],
             'delivery_post_office' => ['nullable', 'string', 'max:255'],
             'recipient_phone' => ['required', 'string', 'max:255'],
+            'recipient_email' => ['nullable', 'email', 'max:255'],
 
             'ransom_amount' => ['nullable', 'numeric', 'min:0'],
             'invoice_number' => ['nullable', 'string', 'max:255'],
@@ -94,6 +97,7 @@ class ShipmentController extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
+
         $shipment = Shipment::create([
             'client_id' => $client->id,
             'barcode' => $this->generateBarcode(),
@@ -104,6 +108,7 @@ class ShipmentController extends Controller
             'recipient_city' => $validated['recipient_city'],
             'delivery_post_office' => $validated['delivery_post_office'] ?? null,
             'recipient_phone' => $validated['recipient_phone'],
+            'recipient_email' => $validated['recipient_email'] ?? null,
 
             'ransom_amount' => $validated['ransom_amount'] ?? 0,
             'invoice_number' => $validated['invoice_number'] ?? null,
@@ -124,6 +129,11 @@ class ShipmentController extends Controller
             'changed_at' => now(),
             'note' => 'Shipment created by client.',
         ]);
+
+        if ($shipment->recipient_email) {
+            Mail::to($shipment->recipient_email)
+                ->send(new ShipmentDeliveryCodeMail($shipment));
+        }
 
         return redirect()
             ->route('client.shipments.index')

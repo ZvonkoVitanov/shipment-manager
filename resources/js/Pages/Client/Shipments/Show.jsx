@@ -58,6 +58,7 @@ export default function Show({ shipment }) {
                             <div className="mt-4 space-y-3 text-sm">
                                 <Detail label="Recipient" value={shipment.recipient_name} />
                                 <Detail label="Phone" value={shipment.recipient_phone} />
+                                <Detail label="Recipient Email" value={shipment.recipient_email} />
                                 <Detail label="Address" value={shipment.recipient_address} />
                                 <Detail label="City" value={shipment.recipient_city} />
                                 <Detail label="Post Office" value={shipment.delivery_post_office} />

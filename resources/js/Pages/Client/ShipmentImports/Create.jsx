@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import {Head, Link, useForm} from '@inertiajs/react';
 
 export default function Create() {
-    const { data, setData, post, processing, errors } = useForm({
+    const {data, setData, post, processing, errors} = useForm({
         file: null,
     });
 
@@ -16,7 +16,7 @@ export default function Create() {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Upload Excel Import" />
+            <Head title="Upload Excel Import"/>
 
             <div className="py-12">
                 <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
@@ -33,7 +33,8 @@ export default function Create() {
                         </h1>
 
                         <p className="mt-1 text-sm text-gray-600">
-                            Upload an Excel file with shipment data. The system will validate it before creating shipments.
+                            Upload an Excel file with shipment data. The system will validate it before creating
+                            shipments.
                         </p>
                     </div>
 
@@ -65,7 +66,7 @@ export default function Create() {
 
                             <p className="mt-2 font-mono text-xs">
                                 recipient_name, recipient_address, recipient_city,
-                                delivery_post_office, recipient_phone, ransom_amount,
+                                delivery_post_office, recipient_phone, recipient_email, ransom_amount,
                                 invoice_number, weight, delivery_type, pickup_type,
                                 pickup_location, note
                             </p>

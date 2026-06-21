@@ -8,6 +8,7 @@ export default function Create() {
         recipient_city: '',
         delivery_post_office: '',
         recipient_phone: '',
+        recipient_email: '',
 
         ransom_amount: '',
         invoice_number: '',
@@ -68,6 +69,14 @@ export default function Create() {
                                     value={data.recipient_phone}
                                     error={errors.recipient_phone}
                                     onChange={(e) => setData('recipient_phone', e.target.value)}
+                                />
+
+                                <Input
+                                    label="Recipient Email"
+                                    type="email"
+                                    value={data.recipient_email}
+                                    error={errors.recipient_email}
+                                    onChange={(e) => setData('recipient_email', e.target.value)}
                                 />
 
                                 <Input

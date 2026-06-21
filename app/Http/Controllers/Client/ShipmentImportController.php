@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ShipmentDeliveryCodeMail;
 use App\Models\ShipmentImport;
 use App\Models\ShipmentImportRow;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -116,6 +118,7 @@ class ShipmentImportController extends Controller
             'recipient_address' => ['required', 'string', 'max:255'],
             'recipient_city' => ['required', 'string', 'max:255'],
             'recipient_phone' => ['required'],
+            'recipient_email' => ['nullable', 'email', 'max:255'],
             'ransom_amount' => ['nullable', 'numeric', 'min:0'],
             'invoice_number' => ['nullable', 'string', 'max:255'],
             'weight' => ['nullable', 'numeric', 'min:0'],
@@ -182,6 +185,7 @@ class ShipmentImportController extends Controller
                     'recipient_city' => $data['recipient_city'],
                     'delivery_post_office' => $data['delivery_post_office'] ?? null,
                     'recipient_phone' => $data['recipient_phone'],
+                    'recipient_email' => $data['recipient_email'] ?? null,
 
                     'ransom_amount' => $data['ransom_amount'] ?? 0,
                     'invoice_number' => $data['invoice_number'] ?? null,
@@ -202,6 +206,11 @@ class ShipmentImportController extends Controller
                     'changed_at' => now(),
                     'note' => 'Shipment created from Excel import.',
                 ]);
+
+                if ($shipment->recipient_email) {
+                    Mail::to($shipment->recipient_email)
+                        ->send(new ShipmentDeliveryCodeMail($shipment));
+                }
             }
 
             $import->update([

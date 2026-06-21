@@ -56,6 +56,7 @@ export default function Show({ shipment, statuses }) {
                                 <Detail label="Client" value={shipment.client?.company_name} />
                                 <Detail label="Recipient" value={shipment.recipient_name} />
                                 <Detail label="Phone" value={shipment.recipient_phone} />
+                                <Detail label="Recipient Email" value={shipment.recipient_email} />
                                 <Detail label="Address" value={shipment.recipient_address} />
                                 <Detail label="City" value={shipment.recipient_city} />
                                 <Detail label="Post Office" value={shipment.delivery_post_office} />
