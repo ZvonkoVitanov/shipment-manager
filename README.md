@@ -122,3 +122,142 @@ Clients can follow the progress of their shipments from their dashboard.
 - **Vite** - Frontend build tool
 
 ---
+
+## Local Docker Setup
+
+This project can be run locally using Docker.
+
+The local setup includes:
+
+- Laravel app container
+- MySQL database container
+- Vite development server
+- Automatic startup with Docker Compose
+- Database migrations and seeders for test users
+
+---
+
+## Requirements
+
+Make sure you have installed:
+
+- Docker
+- Docker Compose
+
+---
+
+## First-time setup
+
+Run:
+
+```bash
+./scripts/local-setup.sh
+```
+
+The script will:
+
+- Build and start the containers
+- Install Composer dependencies
+- Install NPM dependencies
+- Create `.env` from `.env.example` if needed
+- Generate the Laravel app key
+- Run database migrations
+- Seed the database with test users
+
+After it finishes, open:
+
+```text
+http://localhost:8000
+```
+
+---
+
+## Start the project later
+
+After the first setup, start the project with:
+
+```bash
+docker compose -f compose.local.yaml up -d
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+Laravel and Vite will start automatically.
+
+---
+
+## Stop the project
+
+```bash
+docker compose -f compose.local.yaml down
+```
+
+---
+
+## Rebuild containers
+
+Use this if Docker files were changed:
+
+```bash
+docker compose -f compose.local.yaml up -d --build
+```
+
+---
+
+## Useful commands
+
+View running containers:
+
+```bash
+docker ps
+```
+
+View app logs:
+
+```bash
+docker logs -f shipment_manager_local_app
+```
+
+Enter the app container:
+
+```bash
+docker exec -it shipment_manager_local_app bash
+```
+
+Run migrations manually:
+
+```bash
+docker exec shipment_manager_local_app php artisan migrate
+```
+
+Run seeders manually:
+
+```bash
+docker exec shipment_manager_local_app php artisan db:seed
+```
+
+---
+
+## Local services
+
+Application:
+
+```text
+http://localhost:8000
+```
+
+Vite:
+
+```text
+http://localhost:5173
+```
+
+MySQL:
+
+```text
+localhost:3307
+```

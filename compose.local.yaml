@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    container_name: shipment_manager_local_app
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    depends_on:
+      - mysql
+    networks:
+      - shipment_manager_local
+    command: >
+      sh -c "php artisan serve --host=0.0.0.0 --port=8000 &
+             npm run dev -- --host 0.0.0.0"
+
+  mysql:
+    image: mysql:8.4
+    container_name: shipment_manager_local_mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: shipment_manager
+      MYSQL_USER: shipment_user
+      MYSQL_PASSWORD: shipment_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - mysql_local_data:/var/lib/mysql
+    networks:
+      - shipment_manager_local
+
+volumes:
+  mysql_local_data:
+
+networks:
+  shipment_manager_local:
+    driver: bridge
