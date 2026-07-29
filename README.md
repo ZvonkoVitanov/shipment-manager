@@ -261,3 +261,19 @@ MySQL:
 ```text
 localhost:3307
 ```
+
+## Live Demo
+
+The application is available at:
+
+**https://shipment-manager.mk**
+
+You can test the main user roles with the demo accounts below.
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@example.com | password |
+| Client | client@example.com | password |
+| Operator | operator@example.com | password |
+
+> These accounts are for demo purposes only. The data in the application is test data.
